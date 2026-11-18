@@ -1,0 +1,283 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//* ENUMS
+
+enum Sexo {
+  macho
+  hembra
+}
+
+enum EstadoPerro {
+  perdido
+  encontrado
+  en_refugio
+  en_tratamiento
+  adoptado
+}
+
+enum TipoReporte {
+  perdido
+  encontrado
+  maltrato
+}
+
+enum EstadoReporte {
+  pendiente
+  en_revision
+  verificado
+  descartado
+  cerrado
+}
+
+enum PrioridadCaso {
+  baja
+  media
+  alta
+  urgente
+}
+
+enum EstadoCaso {
+  abierto
+  en_proceso
+  resuelto
+  cerrado
+}
+
+enum EstadoAdopcion {
+  pendiente
+  aprobada
+  rechazada
+  cancelada
+}
+
+enum EstadoTratamiento {
+  en_curso
+  finalizado
+  suspendido
+}
+
+//* MODELOS
+
+model Rol {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+  users  User[]
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  apellido      String
+  email         String   @unique
+  password_hash String
+  telefono      String
+
+  rol_id Int
+  rol    Rol @relation(fields: [rol_id], references: [id])
+
+  activo         Boolean  @default(true)
+  fecha_registro DateTime @default(now())
+
+  refugio     Refugio?
+  veterinaria Veterinaria?
+
+  reportes          Reporte[]         @relation("ReporteAutor")
+  reportesRevisados Reporte[]         @relation("ReporteRevisor")
+  casosAsignados    Caso[]            @relation("CasoAsignado")
+  seguimientos      CasoSeguimiento[]
+  adopciones        Adopcion[]
+  comentarios       Comentario[]
+}
+
+model Refugio {
+  id               Int     @id @default(autoincrement())
+  usuario_id       Int?    @unique
+  nombre           String  @db.VarChar(150)
+  direccion        String? @db.VarChar(200)
+  telefono         String? @db.VarChar(30)
+  capacidad_maxima Int?
+  descripcion      String?
+
+  horarios  String?  @db.VarChar(200)
+  servicios String[]
+
+  afiliado_confirmado Boolean @default(false)
+
+  // Si se elimina el User asociado, el refugio no se borra, usuario_id queda NULL
+  usuario User? @relation(fields: [usuario_id], references: [id], onDelete: SetNull)
+
+  perros     Perro[]
+  adopciones Adopcion[]
+}
+
+model Veterinaria {
+  id         Int     @id @default(autoincrement())
+  usuario_id Int?    @unique
+  nombre     String  @db.VarChar(150)
+  direccion  String? @db.VarChar(200)
+  telefono   String? @db.VarChar(30)
+  matricula  String? @db.VarChar(50)
+
+  horarios  String?  @db.VarChar(200)
+  servicios String[]
+
+  afiliado_confirmado Boolean @default(false)
+
+  // Si se elimina el User asociado, la veterinaria no se borra, usuario_id queda NULL
+  usuario User? @relation(fields: [usuario_id], references: [id], onDelete: SetNull)
+
+  tratamientos TratamientoMedico[]
+}
+
+model Perro {
+  id              Int     @id @default(autoincrement())
+  nombre          String? @db.VarChar(100)
+  raza            String? @db.VarChar(100)
+  edad_aproximada Int?
+  sexo            Sexo?
+
+  estado_actual EstadoPerro @default(perdido)
+
+  publicado Boolean @default(false)
+
+  refugio_actual_id Int?
+  refugio           Refugio? @relation(fields: [refugio_actual_id], references: [id], onDelete: SetNull)
+
+  fecha_registro DateTime @default(now())
+
+  fotos        PerroFoto[]
+  reportes     Reporte[]
+  adopciones   Adopcion[]
+  tratamientos TratamientoMedico[]
+}
+
+model PerroFoto {
+  id           Int      @id @default(autoincrement())
+  perro_id     Int
+  url          String   @db.VarChar(300)
+  es_principal Boolean  @default(false)
+  fecha_subida DateTime @default(now())
+
+  perro Perro @relation(fields: [perro_id], references: [id], onDelete: Cascade)
+}
+
+model Reporte {
+  id Int @id @default(autoincrement())
+
+  tipo       TipoReporte
+  usuario_id Int
+  perro_id   Int?
+
+  titulo      String  @db.VarChar(150)
+  descripcion String?
+  direccion   String? @db.VarChar(200)
+
+  estado        EstadoReporte @default(pendiente)
+  fecha_reporte DateTime      @default(now())
+
+  revisado_por    Int?
+  fecha_revision  DateTime?
+  motivo_descarte String?
+
+  // Si se elimina el autor, se borra en cascada el reporte
+  usuario User @relation("ReporteAutor", fields: [usuario_id], references: [id], onDelete: Cascade)
+  // Si se elimina el revisor, el campo revisado_por queda NULL
+  revisor User? @relation("ReporteRevisor", fields: [revisado_por], references: [id], onDelete: SetNull)
+  // Si se elimina el perro, el reporte no se borra pero perro_id queda NULL
+  perro   Perro? @relation(fields: [perro_id], references: [id], onDelete: SetNull)
+
+  fotos       ReporteFoto[]
+  comentarios Comentario[]
+  caso        Caso?
+}
+
+model ReporteFoto {
+  id           Int      @id @default(autoincrement())
+  reporte_id   Int
+  url          String   @db.VarChar(300)
+  fecha_subida DateTime @default(now())
+
+  reporte Reporte @relation(fields: [reporte_id], references: [id], onDelete: Cascade)
+}
+
+model Comentario {
+  id         Int      @id @default(autoincrement())
+  reporte_id Int
+  usuario_id Int
+  comentario String
+  fecha      DateTime @default(now())
+
+  reporte Reporte @relation(fields: [reporte_id], references: [id], onDelete: Cascade)
+  usuario User    @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+}
+
+model Caso {
+  id             Int           @id @default(autoincrement())
+  reporte_id     Int           @unique
+  asignado_a     Int?
+  prioridad      PrioridadCaso @default(media)
+  estado         EstadoCaso    @default(abierto)
+  fecha_apertura DateTime      @default(now())
+  fecha_cierre   DateTime?
+  resolucion     String?
+
+  reporte  Reporte @relation(fields: [reporte_id], references: [id], onDelete: Cascade)
+  asignado User?   @relation("CasoAsignado", fields: [asignado_a], references: [id], onDelete: SetNull)
+
+  seguimientos CasoSeguimiento[]
+}
+
+model CasoSeguimiento {
+  id              Int         @id @default(autoincrement())
+  caso_id         Int
+  usuario_id      Int
+  comentario      String
+  estado_anterior EstadoCaso?
+  estado_nuevo    EstadoCaso?
+  fecha           DateTime    @default(now())
+
+  caso    Caso @relation(fields: [caso_id], references: [id], onDelete: Cascade)
+  usuario User @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+}
+
+model Adopcion {
+  id               Int            @id @default(autoincrement())
+  perro_id         Int
+  adoptante_id     Int
+  refugio_id       Int
+  estado           EstadoAdopcion @default(pendiente)
+  fecha_solicitud  DateTime       @default(now())
+  fecha_resolucion DateTime?
+  observaciones    String?
+
+  perro     Perro   @relation(fields: [perro_id], references: [id], onDelete: Cascade)
+  adoptante User    @relation(fields: [adoptante_id], references: [id], onDelete: Cascade)
+  refugio   Refugio @relation(fields: [refugio_id], references: [id], onDelete: Cascade)
+
+  @@index([perro_id, adoptante_id])
+}
+
+model TratamientoMedico {
+  id             Int               @id @default(autoincrement())
+  perro_id       Int
+  veterinaria_id Int
+  diagnostico    String?
+  tratamiento    String?
+  estado         EstadoTratamiento @default(en_curso)
+  fecha_inicio   DateTime          @default(now()) @db.Date
+  fecha_fin      DateTime?         @db.Date
+
+  perro       Perro       @relation(fields: [perro_id], references: [id], onDelete: Cascade)
+  veterinaria Veterinaria @relation(fields: [veterinaria_id], references: [id], onDelete: Cascade)
+}

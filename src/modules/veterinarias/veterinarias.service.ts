@@ -1,11 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVeterinariaDto } from './dto/create-veterinaria.dto';
 import { UpdateVeterinariaDto } from './dto/update-veterinaria.dto';
+import { Prisma } from '../../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class VeterinariasService {
+  constructor( private readonly prisma:PrismaService){}
   create(createVeterinariaDto: CreateVeterinariaDto) {
-    return 'This action adds a new veterinaria';
+    const {...data}=createVeterinariaDto
+    try {
+      return
+      
+    } catch (error) {
+      
+    }
   }
 
   findAll() {
