@@ -1,13 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { AsignarRolDto } from './dto/asignar-rol.dto';
 
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.create(createUsuarioDto);
   }
@@ -18,18 +31,28 @@ export class UsuariosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.usuariosService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usuariosService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+  ) {
+    return this.usuariosService.update(id, updateUsuarioDto);
+  }
+
+  @Patch(':id/rol')
+  asignarRol(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() asignarRolDto: AsignarRolDto,
+  ) {
+    return this.usuariosService.asignarRol(id, asignarRolDto.rol_id);
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  remove(@Param('id') id: number) {
-    return this.usuariosService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.usuariosService.remove(id);
   }
-}
+} 
