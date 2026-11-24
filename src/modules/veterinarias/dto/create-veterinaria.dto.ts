@@ -1,17 +1,51 @@
-import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateVeterinariaDto {
-@IsBoolean() @IsOptional() afiliado_confirmado?:boolean
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  usuario_id?: number;
 
-@IsString() @IsOptional() direccion?:string
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(150)
+  nombre: string;
 
-@IsString() @IsOptional() horarios?:string
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  direccion?: string;
 
-@IsString() @IsOptional() matricula?:string
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  telefono?: string;
 
-@IsString() @IsOptional() nombre?:string
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  horarios?: string;
 
-@IsOptional() @IsArray() @IsString({each:true}) servicios?:string
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  matricula?: string;
 
-@IsString() @IsOptional() telefono?:string
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  servicios?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  afiliado_confirmado?: boolean;
 }
