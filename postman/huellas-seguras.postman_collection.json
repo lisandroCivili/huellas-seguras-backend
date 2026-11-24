@@ -1,0 +1,1375 @@
+{
+  "info": {
+    "name": "Huellas Seguras API",
+    "description": "Colección de la API de Huellas Seguras (NestJS).\n\nVariables: baseUrl, token (se guarda sola al hacer Login/Register) e ids de cada recurso (se guardan solos al crear).\n\nNota: la API no expone endpoints PUT, las actualizaciones se hacen con PATCH.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "usuarioId",
+      "value": "1"
+    },
+    {
+      "key": "rolId",
+      "value": "1"
+    },
+    {
+      "key": "refugioId",
+      "value": "1"
+    },
+    {
+      "key": "veterinariaId",
+      "value": "1"
+    },
+    {
+      "key": "perroId",
+      "value": "1"
+    },
+    {
+      "key": "reporteId",
+      "value": "1"
+    },
+    {
+      "key": "casoId",
+      "value": "1"
+    },
+    {
+      "key": "adopcionId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "App",
+      "item": [
+        {
+          "name": "Health / Hello",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": []
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"Password123!\",\n  \"telefono\": \"+5491122334455\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('token', json.access_token);",
+                  "  if (json.usuario && json.usuario.id) pm.collectionVariables.set('usuarioId', json.usuario.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('token', json.access_token);",
+                  "  if (json.usuario && json.usuario.id) pm.collectionVariables.set('usuarioId', json.usuario.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me (requiere JWT)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María\",\n  \"apellido\": \"Gómez\",\n  \"email\": \"maria.gomez@example.com\",\n  \"password\": \"Password123!\",\n  \"telefono\": \"+5491155667788\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('usuarioId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Usuario por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Usuario (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"María Laura\",\n  \"apellido\": \"Gómez\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Asignar rol a Usuario (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}/rol",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}",
+                "rol"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rol_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Refugios",
+      "item": [
+        {
+          "name": "Crear Refugios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refugios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refugios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario_id\": 1,\n  \"nombre\": \"Refugio Patitas\",\n  \"direccion\": \"Av. Siempre Viva 742\",\n  \"telefono\": \"+5491122334455\",\n  \"capacidad_maxima\": 50,\n  \"descripcion\": \"Refugio de perros rescatados\",\n  \"horarios\": \"Lun a Vie 9 a 18\",\n  \"servicios\": [\n    \"alojamiento\",\n    \"adopciones\"\n  ],\n  \"afiliado_confirmado\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('refugioId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Refugios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/refugios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refugios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Refugios (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/refugios?afiliado_confirmado=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refugios"
+              ],
+              "query": [
+                {
+                  "key": "afiliado_confirmado",
+                  "value": "true",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Refugios por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/refugios/{{refugioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refugios",
+                "{{refugioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Refugios (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refugios/{{refugioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refugios",
+                "{{refugioId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Refugio Patitas Felices\",\n  \"capacidad_maxima\": 80,\n  \"afiliado_confirmado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Refugios",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/refugios/{{refugioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refugios",
+                "{{refugioId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Veterinarias",
+      "item": [
+        {
+          "name": "Crear Veterinarias",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/veterinarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "veterinarias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario_id\": 1,\n  \"nombre\": \"Veterinaria San Roque\",\n  \"direccion\": \"Calle Falsa 123\",\n  \"telefono\": \"+5491122334455\",\n  \"horarios\": \"Lun a Sáb 8 a 20\",\n  \"matricula\": \"MP-12345\",\n  \"servicios\": [\n    \"consultas\",\n    \"vacunación\",\n    \"cirugía\"\n  ],\n  \"afiliado_confirmado\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('veterinariaId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Veterinarias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/veterinarias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "veterinarias"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Veterinarias (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/veterinarias?afiliado_confirmado=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "veterinarias"
+              ],
+              "query": [
+                {
+                  "key": "afiliado_confirmado",
+                  "value": "true",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Veterinarias por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/veterinarias/{{veterinariaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "veterinarias",
+                "{{veterinariaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Veterinarias (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/veterinarias/{{veterinariaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "veterinarias",
+                "{{veterinariaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"horarios\": \"Lun a Dom 8 a 22\",\n  \"afiliado_confirmado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Veterinarias",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/veterinarias/{{veterinariaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "veterinarias",
+                "{{veterinariaId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Perros",
+      "item": [
+        {
+          "name": "Crear Perros",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/perros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "perros"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Firulais\",\n  \"raza\": \"Mestizo\",\n  \"edad_aproximada\": 3,\n  \"sexo\": \"macho\",\n  \"estado_actual\": \"en_refugio\",\n  \"publicado\": true,\n  \"refugio_actual_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('perroId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Perros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/perros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "perros"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Perros (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/perros?estado_actual=en_refugio&refugio_actual_id=1&publicado=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "perros"
+              ],
+              "query": [
+                {
+                  "key": "estado_actual",
+                  "value": "en_refugio",
+                  "disabled": false
+                },
+                {
+                  "key": "refugio_actual_id",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "publicado",
+                  "value": "true",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Perros por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/perros/{{perroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "perros",
+                "{{perroId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Perros (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/perros/{{perroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "perros",
+                "{{perroId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Firulais II\",\n  \"estado_actual\": \"adoptado\",\n  \"publicado\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Perros",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/perros/{{perroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "perros",
+                "{{perroId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "item": [
+        {
+          "name": "Crear Reportes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reportes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"perdido\",\n  \"usuario_id\": 1,\n  \"perro_id\": 1,\n  \"titulo\": \"Perro perdido en el centro\",\n  \"descripcion\": \"Visto por última vez cerca de la plaza\",\n  \"direccion\": \"Plaza Principal\",\n  \"estado\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('reporteId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Reportes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Reportes (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes?tipo=perdido&estado=pendiente&usuario_id=1&perro_id=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes"
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "perdido",
+                  "disabled": false
+                },
+                {
+                  "key": "estado",
+                  "value": "pendiente",
+                  "disabled": false
+                },
+                {
+                  "key": "usuario_id",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "perro_id",
+                  "value": "1",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Reportes por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/{{reporteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Reportes (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/{{reporteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporteId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"en_revision\",\n  \"revisado_por\": 1,\n  \"fecha_revision\": \"2026-11-24T12:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Reportes",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/{{reporteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporteId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Casos",
+      "item": [
+        {
+          "name": "Crear Casos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/casos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "casos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reporte_id\": 1,\n  \"asignado_a\": 1,\n  \"prioridad\": \"media\",\n  \"estado\": \"abierto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('casoId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Casos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/casos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "casos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Casos (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/casos?estado=abierto&prioridad=media&asignado_a=1&reporte_id=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "casos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "abierto",
+                  "disabled": false
+                },
+                {
+                  "key": "prioridad",
+                  "value": "media",
+                  "disabled": false
+                },
+                {
+                  "key": "asignado_a",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "reporte_id",
+                  "value": "1",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Casos por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/casos/{{casoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "casos",
+                "{{casoId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Casos (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/casos/{{casoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "casos",
+                "{{casoId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prioridad\": \"alta\",\n  \"estado\": \"en_proceso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Casos",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/casos/{{casoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "casos",
+                "{{casoId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Adopciones",
+      "item": [
+        {
+          "name": "Crear Adopciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adopciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "adopciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"perro_id\": 1,\n  \"adoptante_id\": 1,\n  \"refugio_id\": 1,\n  \"estado\": \"pendiente\",\n  \"observaciones\": \"Familia con patio amplio\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('adopcionId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Adopciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/adopciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "adopciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Adopciones (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/adopciones?estado=pendiente&perro_id=1&adoptante_id=1&refugio_id=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "adopciones"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "pendiente",
+                  "disabled": false
+                },
+                {
+                  "key": "perro_id",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "adoptante_id",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "refugio_id",
+                  "value": "1",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Adopciones por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/adopciones/{{adopcionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "adopciones",
+                "{{adopcionId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Adopciones (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adopciones/{{adopcionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "adopciones",
+                "{{adopcionId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"aprobada\",\n  \"fecha_resolucion\": \"2026-11-24T12:00:00.000Z\",\n  \"observaciones\": \"Adopción aprobada tras entrevista\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Adopciones",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/adopciones/{{adopcionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "adopciones",
+                "{{adopcionId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
