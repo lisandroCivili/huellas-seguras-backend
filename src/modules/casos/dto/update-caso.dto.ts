@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { CreateCasoDto } from './create-caso.dto';
 
-export class UpdateCasoDto extends PartialType(CreateCasoDto) {}
+// El reporte de un caso no se puede cambiar una vez creado
+export class UpdateCasoDto extends PartialType(
+  OmitType(CreateCasoDto, ['reporte_id'] as const),
+) {}
